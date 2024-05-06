@@ -2,6 +2,8 @@ import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { DateRange } from "@mui/icons-material";
 import ExpenseSlider from "./ExpenseSlider";
+import { Box } from "@mui/material";
+import SearchInput from "./SearchInput";
 
 export default function DataTable({ data }) {
   const [columns, setColumns] = React.useState([]);
@@ -10,6 +12,7 @@ export default function DataTable({ data }) {
   const [expenseMax, setExpenseMax] = React.useState(-99999);
   const [expenseMin, setExpenseMin] = React.useState(99999);
   const [range, setRange] = React.useState([0, 100]);
+  const [keyword, setKeyword] = React.useState([""]);
 
   React.useEffect(() => {
     if (data.length) {
@@ -45,21 +48,42 @@ export default function DataTable({ data }) {
   }, [data]);
 
   React.useEffect(() => {
-    console.log(expenseMin, expenseMax);
-    const temp = rows.filter((v) => {
-      if (v["Expense"] >= range[0] && v["Expense"] <= range[1]) return true;
-      else return false;
-    });
+    const temp = rows
+      .filter((v) => {
+        const temp = Object.values(v);
+        let flag = false;
+        temp.map((val) => {
+          // String("1").to
+          if (val && val.toString().toLowerCase().indexOf(keyword) !== -1) {
+            flag = true;
+          }
+        });
+        return flag;
+      })
+      .filter((v) => {
+        if (v["Expense"] >= range[0] && v["Expense"] <= range[1]) return true;
+        else return false;
+      });
     setFiltered(temp);
-  }, [range]);
+  }, [range, keyword]);
+
   return (
-    <div style={{ height: "calc(100vh - 210px)", padding: "20px" }}>
-      <ExpenseSlider
-        value1={range}
-        setValue1={setRange}
-        min={expenseMin}
-        max={expenseMax}
-      />
+    <div style={{ height: "calc(100vh - 260px)", padding: "20px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <ExpenseSlider
+          value1={range}
+          setValue1={setRange}
+          min={expenseMin}
+          max={expenseMax}
+        />
+        <SearchInput keyword={keyword} setKeyword={setKeyword} />
+      </Box>
       <DataGrid
         rows={filtered}
         columns={columns}
@@ -70,6 +94,7 @@ export default function DataTable({ data }) {
         }}
         pageSizeOptions={[5, 10, 25, 100]}
         checkboxSelection
+        density="compact"
       />
     </div>
   );
