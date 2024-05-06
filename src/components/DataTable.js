@@ -1,9 +1,44 @@
 import * as React from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbar,
+  GridToolbarContainer,
+  GridToolbarExport,
+} from "@mui/x-data-grid";
 import { DateRange } from "@mui/icons-material";
 import ExpenseSlider from "./ExpenseSlider";
 import { Box } from "@mui/material";
 import SearchInput from "./SearchInput";
+
+function exceljsPreProcess({ workbook, worksheet }) {
+  workbook.created = new Date(); // Add metadata
+  worksheet.name = "Monthly Results"; // Modify worksheet name
+
+  // Write on first line the date of creation
+  worksheet.getCell("A1").value = `Values from the`;
+  worksheet.getCell("A2").value = new Date();
+}
+
+function exceljsPostProcess({ worksheet }) {
+  // Add a text after the data
+  worksheet.addRow(); // Add empty row
+
+  const newRow = worksheet.addRow();
+  newRow.getCell(1).value = "Those data are for internal use only";
+}
+
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarExport
+        excelOptions={{
+          exceljsPreProcess,
+          exceljsPostProcess,
+        }}
+      />
+    </GridToolbarContainer>
+  );
+}
 
 export default function DataTable({ data }) {
   const [columns, setColumns] = React.useState([]);
@@ -95,6 +130,8 @@ export default function DataTable({ data }) {
         pageSizeOptions={[5, 10, 25, 100]}
         checkboxSelection
         density="compact"
+        // slots={{ toolbar: CustomToolbar }}
+        slots={{ toolbar: GridToolbar }}
       />
     </div>
   );

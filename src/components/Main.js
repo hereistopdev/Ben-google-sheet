@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import * as XLSX from "xlsx";
 import DataTable from "./DataTable";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 function MainComp() {
   const [sheetData, setSheetData] = useState([]);
@@ -42,15 +42,22 @@ function MainComp() {
 
   return (
     <Box sx={{ padding: "20px" }}>
-      <div {...getRootProps()} style={dropzoneStyle}>
-        <input {...getInputProps()} />
-        <p>Drag 'n' drop an Excel file here, or click to select one</p>
-      </div>
+      <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
+        <Box {...getRootProps()} style={dropzoneStyle}>
+          <input {...getInputProps()} />
+          <p>Drag 'n' drop an Excel file here, or click to select one</p>
+        </Box>
+        {/* <Box>
+          <Button sx={{ height: "100%" }} color="primary" variant="contained">
+            Export
+          </Button>
+        </Box> */}
+      </Box>
       {uploadedFile && (
-        <div>
+        <Box>
           <p>Uploaded file: {uploadedFile.name}</p>
           {/* You can display additional information about the file here */}
-        </div>
+        </Box>
       )}
       {/* <h2>Excel Data</h2> */}
       <DataTable data={sheetData} />
@@ -61,7 +68,7 @@ function MainComp() {
 const dropzoneStyle = {
   border: "2px dashed #ccc",
   borderRadius: "4px",
-  padding: "20px",
+  padding: "0px 20px",
   textAlign: "center",
   cursor: "pointer",
 };
